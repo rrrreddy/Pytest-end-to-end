@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pytest Comprehensive Guide</title>
+    <style>
+        :root {
+            --color-bg-base: #0f172a;
+            --color-bg-elevated: #1e293b;
+            --color-bg-surface: #334155;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-text-muted: #94a3b8;
+            --color-accent: #38bdf8;
+            --color-accent-dark: #0284c7;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--color-bg-base);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--color-bg-elevated);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        header p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--color-bg-elevated);
+            color: var(--color-text-secondary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: var(--color-accent);
+            color: var(--color-bg-base);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: var(--color-bg-elevated);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .section h2 {
+            color: var(--color-accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--color-bg-surface);
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            color: var(--color-text-primary);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .section p {
+            color: var(--color-text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background: var(--color-bg-base);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: var(--color-text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .code-block code {
+            color: var(--color-accent);
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge-scope {
+            background: var(--color-accent-dark);
+            color: white;
+        }
+
+        .badge-best {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--color-warning);
+            color: white;
+        }
+
+        .badge-error {
+            background: var(--color-error);
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: var(--color-bg-surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-bg-surface);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+        }
+
+        .card h4 {
+            color: var(--color-accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .best-practice {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--color-success);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--color-warning);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .comparison-table th {
+            background: var(--color-bg-surface);
+            color: var(--color-accent);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            background: var(--color-bg-base);
+            color: var(--color-text-secondary);
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-bg-surface);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-muted);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Pytest Comprehensive Guide</h1>
+            <p>Master Python testing with fixtures, mocking, and integration testing</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('fixtures')">Fixtures & Scope</button>
+            <button class="tab-btn" onclick="showTab('mocking')">Mocking & Patching</button>
+            <button class="tab-btn" onclick="showTab('integration')">Integration Testing</button>
+            <button class="tab-btn" onclick="showTab('etl-project')">ETL E2E Testing</button>
+            <button class="tab-btn" onclick="showTab('medallion-project')">Medallion E2E Testing</button>
+            <button class="tab-btn" onclick="showTab('best-practices')">Best Practices</button>
+        </nav>
+
+        <!-- Fixtures Tab -->
+        <div id="fixtures" class="tab-content active">
+            <div class="section">
+                <h2>Pytest Fixtures</h2>
+                <p>Fixtures are functions that provide reusable test data, objects, or setup/teardown logic. They enable modular, scalable testing by eliminating code duplication.</p>
+
+                <h3>Basic Fixture Definition</h3>
+                <div class="code-block">
+                    <pre><code>import pytest
+
+@pytest.fixture
+def sample_data():
+    """Provides sample data for tests."""
+    return {"name": "Alice", "age": 30, "email": "alice@example.com"}
+
+def test_user_name(sample_data):
+    assert sample_data["name"] == "Alice"
+
+def test_user_age(sample_data):
+    assert sample_data["age"] == 30</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Fixture Scopes</h2>
+                <p>Scopes determine how often a fixture is invoked and when teardown occurs. Choose the appropriate scope to optimize test performance and isolation.</p>
+
+                <div class="grid">
+                    <div class="card">
+                        <h4><span class="badge badge-scope">function</span></h4>
+                        <p><strong>Default scope.</strong> Fixture runs once per test function. Use for isolated, fast setup with no side effects.</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge badge-scope">class</span></h4>
+                        <p>Fixture runs once per test class. Useful for sharing state across test methods in the same class.</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge badge-scope">module</span></h4>
+                        <p>Fixture runs once per test module. Ideal for expensive setup operations needed by multiple test functions.</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge badge-scope">package</span></h4>
+                        <p>Fixture runs once per test package. Use for shared resources across multiple modules in a package.</p>
+                    </div>
+                    <div class="card">
+                        <h4><span class="badge badge-scope">session</span></h4>
+                        <p>Fixture runs once per entire test session. Best for very expensive operations like database connections.</p>
+                    </div>
+                </div>
+
+                <h3>Scope Examples</h3>
+                <div class="code-block">
+                    <pre><code>import pytest
+
+# Function scope (default)
+@pytest.fixture
+def temp_file():
+    file = open("temp.txt", "w")
+    yield file
+    file.close()
+
+# Module scope - runs once per module
+@pytest.fixture(scope="module")
+def database_connection():
+    conn = create_db_connection()
+    yield conn
+    conn.close()
+
+# Session scope - runs once for entire test session
+@pytest.fixture(scope="session")
+def api_client():
+    client = APIClient()
+    client.authenticate()
+    yield client
+    client.logout()</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">Best Practice</span> When to Use Each Scope</h4>
+                    <ul>
+                        <li><strong>Function:</strong> Fast setup, no side effects, full isolation needed</li>
+                        <li><strong>Class:</strong> Sharing state across test methods, reducing setup overhead</li>
+                        <li><strong>Module:</strong> Expensive operations (database setup, API connections)</li>
+                        <li><strong>Session:</strong> Very expensive resources shared across all tests</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Dynamic Scope</h2>
+                <p>You can dynamically determine fixture scope based on command-line arguments or configuration.</p>
+                <div class="code-block">
+                    <pre><code>def determine_scope(fixture_name, config):
+    """Dynamically set scope based on CLI option."""
+    if config.getoption("--keep-containers", None):
+        return "session"
+    return "function"
+
+@pytest.fixture(scope=determine_scope)
+def docker_container():
+    container = spawn_container()
+    yield container
+    cleanup_container(container)</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Fixture with Setup and Teardown</h2>
+                <p>Use <span class="highlight">yield</span> to separate setup from teardown logic.</p>
+                <div class="code-block">
+                    <pre><code>@pytest.fixture
+def database():
+    # Setup
+    db = Database()
+    db.connect()
+    db.create_tables()
+    
+    yield db  # Test runs here
+    
+    # Teardown
+    db.drop_tables()
+    db.disconnect()</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>conftest.py - Shared Fixtures</h2>
+                <p>Define fixtures in <span class="highlight">conftest.py</span> to make them available across multiple test files.</p>
+                <div class="code-block">
+                    <pre><code># conftest.py
+import pytest
+
+@pytest.fixture(scope="session")
+def api_base_url():
+    return "https://api.example.com/v1"
+
+@pytest.fixture
+def auth_headers():
+    return {"Authorization": "Bearer test-token"}
+
+# test_api.py
+def test_get_users(api_base_url, auth_headers):
+    response = requests.get(f"{api_base_url}/users", headers=auth_headers)
+    assert response.status_code == 200</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Autouse Fixtures</h2>
+                <p>Automatically applied to all tests in scope without explicitly requesting them.</p>
+                <div class="code-block">
+                    <pre><code>@pytest.fixture(scope="session", autouse=True)
+def setup_test_environment():
+    """Runs automatically before all tests."""
+    print("Setting up test environment")
+    yield
+    print("Tearing down test environment")
+
+def test_example():
+    # setup_test_environment runs automatically
+    assert True</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mocking Tab -->
+        <div id="mocking" class="tab-content">
+            <div class="section">
+                <h2>Mocking & Patching with pytest-mock</h2>
+                <p>Mocking replaces real objects with test doubles to isolate code under test from external dependencies.</p>
+
+                <h3>Installing pytest-mock</h3>
+                <div class="code-block">
+                    <pre><code>pip install pytest-mock</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Basic Mocking Example</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+from myapp import send_email
+
+def test_send_email(mocker):
+    # Mock the email service
+    mock_service = mocker.patch('myapp.email_service.send')
+    
+    # Call the function under test
+    send_email("user@example.com", "Hello!")
+    
+    # Assert the mock was called correctly
+    mock_service.assert_called_once_with(
+        email="user@example.com",
+        message="Hello!"
+    )</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Patching Functions</h2>
+                <p>Use <span class="highlight">mocker.patch()</span> to replace a function during a test. The patch is automatically removed after the test.</p>
+                <div class="code-block">
+                    <pre><code>def test_api_call(mocker):
+    # Mock requests.get to avoid real HTTP calls
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = {"status": "success"}
+    mock_response.status_code = 200
+    
+    mocker.patch('requests.get', return_value=mock_response)
+    
+    # Test your function that uses requests.get
+    result = fetch_data_from_api()
+    assert result["status"] == "success"</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Patching Object Methods</h2>
+                <div class="code-block">
+                    <pre><code>class PaymentGateway:
+    def charge(self, amount, card_token):
+        # Real implementation calls external payment API
+        pass
+
+def test_process_payment(mocker):
+    gateway = PaymentGateway()
+    
+    # Patch the charge method on this specific instance
+    mock_charge = mocker.patch.object(gateway, 'charge', return_value=True)
+    
+    # Test payment processing
+    result = gateway.charge(100.00, "token_123")
+    
+    assert result is True
+    mock_charge.assert_called_once_with(100.00, "token_123")</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Return Values & Side Effects</h2>
+                <div class="code-block">
+                    <pre><code># Setting return value
+mock_function = mocker.Mock(return_value=42)
+assert mock_function() == 42
+
+# Multiple return values
+mock_function.side_effect = [1, 2, 3]
+assert mock_function() == 1
+assert mock_function() == 2
+assert mock_function() == 3
+
+# Raising exceptions
+mock_function.side_effect = ValueError("Invalid input")
+with pytest.raises(ValueError):
+    mock_function()</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Async Mocking</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+from unittest.mock import AsyncMock
+
+@pytest.mark.asyncio
+async def test_async_fetch(mocker):
+    # Mock async function
+    mock_fetch = mocker.patch('myapp.fetch_data', new=AsyncMock())
+    mock_fetch.return_value = {"data": "test"}
+    
+    result = await fetch_data()
+    
+    assert result["data"] == "test"
+    mock_fetch.assert_awaited_once()</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Assertion Methods</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>assert_called()</code></td>
+                            <td>Assert mock was called at least once</td>
+                        </tr>
+                        <tr>
+                            <td><code>assert_called_once()</code></td>
+                            <td>Assert mock was called exactly once</td>
+                        </tr>
+                        <tr>
+                            <td><code>assert_called_with(*args, **kwargs)</code></td>
+                            <td>Assert last call was with specified arguments</td>
+                        </tr>
+                        <tr>
+                            <td><code>assert_called_once_with(*args)</code></td>
+                            <td>Assert called once with specified arguments</td>
+                        </tr>
+                        <tr>
+                            <td><code>assert_not_called()</code></td>
+                            <td>Assert mock was never called</td>
+                        </tr>
+                        <tr>
+                            <td><code>assert_any_call(*args, **kwargs)</code></td>
+                            <td>Assert mock was called with these args at some point</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Mocking Best Practices</h2>
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">1. Mock at System Boundaries</span></h4>
+                    <p>Mock external services, databases, APIs - not internal implementation details.</p>
+                    <div class="code-block">
+                        <pre><code># Good: Mock at system boundary
+def test_good_mock(mocker):
+    mocker.patch("myapp.requests.get")  # External HTTP call
+    
+# Avoid: Mocking internal functions
+def test_bad_mock(mocker):
+    mocker.patch("myapp.utils._internal_helper")  # Internal detail</code></pre>
+                    </div>
+                </div>
+
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">2. Patch Where Used, Not Where Defined</span></h4>
+                    <div class="code-block">
+                        <pre><code># If service.py imports: from myapp.utils import helper_function
+# Patch where it's USED, not where it's defined
+mocker.patch("myapp.service.helper_function")  # ✓ Correct
+# NOT: mocker.patch("myapp.utils.helper_function")  # ✗ Wrong</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <h4><span class="badge badge-warning">Common Pitfalls</span></h4>
+                    <ul>
+                        <li><strong>Mock not being called:</strong> Verify patch path matches import location</li>
+                        <li><strong>Mock returns Mock instead of value:</strong> Set return_value explicitly</li>
+                        <li><strong>Async mock not awaitable:</strong> Use AsyncMock instead of Mock</li>
+                        <li><strong>Wrong patch target:</strong> Patch where function is used, not defined</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Testing Tab -->
+        <div id="integration" class="tab-content">
+            <div class="section">
+                <h2>Integration Testing for Data Pipelines</h2>
+                <p>Integration tests verify that different components of your system work together correctly with external systems like databases, APIs, and cloud services.</p>
+
+                <h3>What to Test</h3>
+                <ul>
+                    <li>Custom code interactions with external systems (S3, databases, APIs)</li>
+                    <li>Schema validation and data transformations</li>
+                    <li>Column ordering and data type preservation</li>
+                    <li>Partition and configuration correctness</li>
+                    <li>End-to-end pipeline functionality</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Testing Strategy</h2>
+                <p>Use containers for open-source systems (Spark, Iceberg) and mocks for proprietary services (AWS, Snowflake).</p>
+
+                <div class="grid">
+                    <div class="card">
+                        <h4>Docker Containers</h4>
+                        <p>Simulate databases, message queues, and services locally using Docker containers with testcontainers-python.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Mock External APIs</h4>
+                        <p>Use libraries like Moto (for AWS services) to mock external APIs without real infrastructure.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Test Fixtures</h4>
+                        <p>Create realistic test data from production (anonymized) or generate with Faker library.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Example: Mocking AWS S3</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+from moto import mock_s3
+import boto3
+
+@pytest.fixture
+def s3_client():
+    with mock_s3():
+        s3 = boto3.client('s3', region_name='us-east-1')
+        s3.create_bucket(Bucket='test-bucket')
+        yield s3
+
+def test_upload_to_s3(s3_client):
+    # Upload test data
+    s3_client.put_object(
+        Bucket='test-bucket',
+        Key='data.csv',
+        Body=b'name,age\nAlice,30\nBob,25'
+    )
+    
+    # Verify upload
+    response = s3_client.get_object(Bucket='test-bucket', Key='data.csv')
+    content = response['Body'].read().decode('utf-8')
+    assert 'Alice,30' in content</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Example: Testing with PySpark</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+@pytest.fixture(scope="session")
+def spark():
+    spark = SparkSession.builder \
+        .appName("test") \
+        .master("local[*]") \
+        .getOrCreate()
+    yield spark
+    spark.stop()
+
+def test_student_table_schema(spark):
+    # Run pipeline
+    run_pipeline(spark)
+    
+    # Read table
+    df = spark.read.format("iceberg").load("local.default.student")
+    
+    # Expected schema
+    expected_schema = StructType([
+        StructField("id", IntegerType(), False),
+        StructField("name", StringType(), False),
+        StructField("age", IntegerType(), True)
+    ])
+    
+    # Verify schema
+    assert df.schema == expected_schema, f"Schema mismatch"
+    
+    # Verify data exists
+    assert df.count() &gt; 0, "Table is empty"</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Databricks Integration Testing</h2>
+                <p>Test Databricks jobs using Pytest with Databricks Connect for remote execution.</p>
+                <div class="code-block">
+                    <pre><code>import pytest
+from databricks.connect import DatabricksSession
+
+@pytest.fixture(scope="session")
+def databricks_session():
+    """Create Databricks Connect session."""
+    session = DatabricksSession.builder.getOrCreate()
+    yield session
+    session.close()
+
+def test_databricks_job(databricks_session):
+    """Test Databricks job execution."""
+    # Trigger job
+    job_run = trigger_job(job_id="12345")
+    
+    # Wait for completion
+    job_run.wait_for_completion()
+    
+    # Validate results
+    output_df = databricks_session.read.table("catalog.schema.output")
+    assert output_df.count() &gt; 0
+    assert "expected_column" in output_df.columns</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Integration Testing Best Practices</h2>
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">What to Test</span></h4>
+                    <ul>
+                        <li>Test that you're using integration features correctly, not the features themselves</li>
+                        <li>Focus on interactions between custom code and external systems</li>
+                        <li>Test schema validation, data transformations, and business logic</li>
+                        <li>Prioritize tests for integrations whose breakage is costly to fix</li>
+                    </ul>
+                </div>
+
+                <div class="warning">
+                    <h4><span class="badge badge-warning">What NOT to Test</span></h4>
+                    <ul>
+                        <li>Don't test whether create_table actually creates a table (trust the vendor)</li>
+                        <li>Don't test third-party library functionality</li>
+                        <li>Don't test every possible integration if low-value</li>
+                        <li>Avoid overly complex fixtures that are hard to maintain</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Test Data Management</h2>
+                <p>Creating realistic test fixtures is crucial for meaningful integration tests.</p>
+                <div class="code-block">
+                    <pre><code>import pytest
+from faker import Faker
+
+@pytest.fixture
+def sample_users():
+    """Generate sample user data."""
+    fake = Faker()
+    return [
+        {
+            "id": i,
+            "name": fake.name(),
+            "email": fake.email(),
+            "created_at": fake.date_time_this_year()
+        }
+        for i in range(1, 101)
+    ]
+
+def test_user_pipeline(sample_users, spark):
+    # Create test DataFrame
+    df = spark.createDataFrame(sample_users)
+    
+    # Run pipeline transformation
+    result = transform_users(df)
+    
+    # Validate output
+    assert result.count() == 100
+    assert "normalized_email" in result.columns</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETL Project E2E Testing Tab -->
+        <div id="etl-project" class="tab-content">
+            <div class="section">
+                <h2>End-to-End ETL Pipeline Testing</h2>
+                <p>Complete example of testing an ETL pipeline that extracts data from PostgreSQL, transforms it with business logic, and loads into a data warehouse.</p>
+
+                <h3>Project Architecture</h3>
+                <div class="code-block">
+                    <pre><code># ETL Pipeline Flow
+Source (PostgreSQL) → Extract → Transform → Load → Target (Snowflake/Redshift)
+                                    ↓
+                              Validation & Quality Checks</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Project Structure</h2>
+                <div class="code-block">
+                    <pre><code>etl_project/
+├── src/
+│   └── etl/
+│       ├── __init__.py
+│       ├── extractors.py      # Data extraction logic
+│       ├── transformers.py    # Transformation logic
+│       ├── loaders.py         # Data loading logic
+│       ├── validators.py      # Data quality checks
+│       └── pipeline.py        # Main pipeline orchestration
+├── tests/
+│   ├── conftest.py           # Shared fixtures
+│   ├── unit/
+│   │   ├── test_extractors.py
+│   │   ├── test_transformers.py
+│   │   └── test_validators.py
+│   └── integration/
+│       ├── test_end_to_end_pipeline.py
+│       └── test_database_operations.py
+├── config/
+│   ├── dev_config.yaml
+│   └── test_config.yaml
+└── requirements.txt</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 1: Setup Test Infrastructure (conftest.py)</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+import pandas as pd
+import psycopg2
+from testcontainers.postgres import PostgresContainer
+from moto import mock_s3
+import boto3
+
+@pytest.fixture(scope="session")
+def postgres_container():
+    """Start PostgreSQL container for testing."""
+    with PostgresContainer("postgres:14") as postgres:
+        yield postgres
+
+@pytest.fixture(scope="session")
+def source_db_connection(postgres_container):
+    """Create source database connection."""
+    conn = psycopg2.connect(
+        host=postgres_container.get_container_host_ip(),
+        port=postgres_container.get_exposed_port(5432),
+        database=postgres_container.POSTGRES_DB,
+        user=postgres_container.POSTGRES_USER,
+        password=postgres_container.POSTGRES_PASSWORD
+    )
+    yield conn
+    conn.close()
+
+@pytest.fixture
+def setup_source_data(source_db_connection):
+    """Populate source database with test data."""
+    cursor = source_db_connection.cursor()
+    
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS customers (
+            customer_id SERIAL PRIMARY KEY,
+            first_name VARCHAR(100),
+            last_name VARCHAR(100),
+            email VARCHAR(255),
+            signup_date DATE,
+            total_purchases DECIMAL(10,2),
+            status VARCHAR(20)
+        )
+    """)
+    
+    test_data = [
+        ('John', 'Doe', 'john@example.com', '2024-01-15', 1500.50, 'active'),
+        ('Jane', 'Smith', 'jane@example.com', '2024-02-20', 2300.75, 'active'),
+        ('Bob', 'Johnson', 'bob@example.com', '2023-12-10', 500.00, 'inactive'),
+        ('Alice', 'Williams', None, '2024-03-01', 0.00, 'pending'),  # Missing email
+    ]
+    
+    cursor.executemany("""
+        INSERT INTO customers 
+        (first_name, last_name, email, signup_date, total_purchases, status)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, test_data)
+    
+    source_db_connection.commit()
+    yield
+    
+    cursor.execute("DROP TABLE IF EXISTS customers")
+    source_db_connection.commit()
+
+@pytest.fixture
+def s3_mock():
+    """Mock S3 for staging data."""
+    with mock_s3():
+        s3 = boto3.client('s3', region_name='us-east-1')
+        s3.create_bucket(Bucket='etl-staging-bucket')
+        yield s3</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 2: Extractor Implementation & Tests</h2>
+                <div class="code-block">
+                    <pre><code># src/etl/extractors.py
+import pandas as pd
+
+class PostgresExtractor:
+    def __init__(self, connection):
+        self.connection = connection
+    
+    def extract_customers(self, start_date=None):
+        """Extract customer data from PostgreSQL."""
+        query = "SELECT * FROM customers"
+        if start_date:
+            query += f" WHERE signup_date &gt;= '{start_date}'"
+        
+        df = pd.read_sql(query, self.connection)
+        return df
+
+def test_extract_all_customers(source_db_connection, setup_source_data):
+    """Test extraction of all customer records."""
+    extractor = PostgresExtractor(source_db_connection)
+    df = extractor.extract_customers()
+    
+    assert len(df) == 4
+    assert list(df.columns) == [
+        'customer_id', 'first_name', 'last_name', 
+        'email', 'signup_date', 'total_purchases', 'status'
+    ]
+
+def test_extract_customers_by_date(source_db_connection, setup_source_data):
+    """Test extraction with date filter."""
+    extractor = PostgresExtractor(source_db_connection)
+    df = extractor.extract_customers(start_date='2024-01-01')
+    
+    assert len(df) == 3  # Only 2024 records
+    assert all(df['signup_date'] &gt;= pd.to_datetime('2024-01-01'))</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 3: Transformer Implementation & Tests</h2>
+                <div class="code-block">
+                    <pre><code># src/etl/transformers.py
+import pandas as pd
+
+class CustomerTransformer:
+    def transform(self, df):
+        """Apply business transformations to customer data."""
+        df = df.copy()
+        
+        df['full_name'] = df['first_name'] + ' ' + df['last_name']
+        
+        df['customer_tier'] = pd.cut(
+            df['total_purchases'],
+            bins=[0, 500, 1500, float('inf')],
+            labels=['bronze', 'silver', 'gold']
+        )
+        
+        df['has_email'] = df['email'].notna()
+        
+        df['days_since_signup'] = (
+            pd.Timestamp.now() - pd.to_datetime(df['signup_date'])
+        ).dt.days
+        
+        return df
+
+def test_transform_creates_full_name():
+    """Test full_name column creation."""
+    input_df = pd.DataFrame({
+        'first_name': ['John', 'Jane'],
+        'last_name': ['Doe', 'Smith'],
+        'email': ['john@example.com', 'jane@example.com'],
+        'signup_date': ['2024-01-15', '2024-02-20'],
+        'total_purchases': [1500.50, 2300.75],
+        'status': ['active', 'active']
+    })
+    
+    transformer = CustomerTransformer()
+    result = transformer.transform(input_df)
+    
+    assert 'full_name' in result.columns
+    assert result['full_name'].tolist() == ['John Doe', 'Jane Smith']
+
+def test_transform_customer_tier():
+    """Test customer tier categorization."""
+    input_df = pd.DataFrame({
+        'first_name': ['Alice', 'Bob', 'Charlie'],
+        'last_name': ['A', 'B', 'C'],
+        'email': ['a@example.com', 'b@example.com', 'c@example.com'],
+        'signup_date': ['2024-01-01', '2024-01-01', '2024-01-01'],
+        'total_purchases': [300.0, 1200.0, 2500.0],
+        'status': ['active', 'active', 'active']
+    })
+    
+    transformer = CustomerTransformer()
+    result = transformer.transform(input_df)
+    
+    assert result['customer_tier'].tolist() == ['bronze', 'silver', 'gold']
+
+def test_transform_handles_missing_email():
+    """Test email validation flag."""
+    input_df = pd.DataFrame({
+        'first_name': ['Alice'],
+        'last_name': ['Smith'],
+        'email': [None],
+        'signup_date': ['2024-01-01'],
+        'total_purchases': [0.0],
+        'status': ['pending']
+    })
+    
+    transformer = CustomerTransformer()
+    result = transformer.transform(input_df)
+    
+    assert result['has_email'].iloc[0] == False</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 4: Data Quality Validators</h2>
+                <div class="code-block">
+                    <pre><code># src/etl/validators.py
+class DataValidator:
+    def __init__(self, df):
+        self.df = df
+        self.errors = []
+    
+    def validate_schema(self, required_columns):
+        """Validate required columns exist."""
+        missing = set(required_columns) - set(self.df.columns)
+        if missing:
+            self.errors.append(f"Missing columns: {missing}")
+        return len(missing) == 0
+    
+    def validate_no_nulls(self, columns):
+        """Check for null values in critical columns."""
+        for col in columns:
+            if self.df[col].isnull().any():
+                null_count = self.df[col].isnull().sum()
+                self.errors.append(f"Column '{col}' has {null_count} null values")
+        return len(self.errors) == 0
+    
+    def validate_row_count(self, min_rows=1):
+        """Ensure minimum row count."""
+        if len(self.df) &lt; min_rows:
+            self.errors.append(f"Expected at least {min_rows} rows, got {len(self.df)}")
+            return False
+        return True
+    
+    def validate_unique(self, column):
+        """Check for duplicate values."""
+        duplicates = self.df[column].duplicated().sum()
+        if duplicates &gt; 0:
+            self.errors.append(f"Column '{column}' has {duplicates} duplicates")
+            return False
+        return True
+
+def test_validator_schema():
+    """Test schema validation."""
+    df = pd.DataFrame({'a': [1], 'b': [2]})
+    validator = DataValidator(df)
+    
+    assert validator.validate_schema(['a', 'b']) == True
+    assert validator.validate_schema(['a', 'c']) == False
+    assert 'Missing columns' in validator.errors[0]
+
+def test_validator_nulls():
+    """Test null validation."""
+    df = pd.DataFrame({'id': [1, 2, None], 'name': ['A', 'B', 'C']})
+    validator = DataValidator(df)
+    
+    assert validator.validate_no_nulls(['id']) == False
+    assert validator.validate_no_nulls(['name']) == True</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 5: End-to-End Pipeline Test</h2>
+                <div class="code-block">
+                    <pre><code># tests/integration/test_end_to_end_pipeline.py
+import pytest
+from etl.extractors import PostgresExtractor
+from etl.transformers import CustomerTransformer
+from etl.validators import DataValidator
+
+def test_complete_etl_pipeline(source_db_connection, setup_source_data, s3_mock):
+    """Test complete ETL pipeline from extraction to validation."""
+    
+    extractor = PostgresExtractor(source_db_connection)
+    raw_data = extractor.extract_customers()
+    
+    assert len(raw_data) &gt; 0, "No data extracted"
+    print(f"✓ Extracted {len(raw_data)} records")
+    
+    transformer = CustomerTransformer()
+    transformed_data = transformer.transform(raw_data)
+    
+    assert 'full_name' in transformed_data.columns
+    assert 'customer_tier' in transformed_data.columns
+    assert 'has_email' in transformed_data.columns
+    print(f"✓ Transformed data with {len(transformed_data.columns)} columns")
+    
+    validator = DataValidator(transformed_data)
+    
+    required_cols = ['customer_id', 'full_name', 'email', 
+                     'customer_tier', 'has_email']
+    assert validator.validate_schema(required_cols)
+    assert validator.validate_row_count(min_rows=1)
+    assert validator.validate_unique('customer_id')
+    
+    print(f"✓ Data quality checks passed")
+    
+    csv_buffer = transformed_data.to_csv(index=False)
+    s3_mock.put_object(
+        Bucket='etl-staging-bucket',
+        Key='customers/transformed_customers.csv',
+        Body=csv_buffer
+    )
+    
+    response = s3_mock.get_object(
+        Bucket='etl-staging-bucket',
+        Key='customers/transformed_customers.csv'
+    )
+    loaded_data = pd.read_csv(response['Body'])
+    
+    assert len(loaded_data) == len(transformed_data)
+    print(f"✓ Loaded {len(loaded_data)} records to S3")
+    
+    assert loaded_data['customer_tier'].isin(['bronze', 'silver', 'gold']).all()
+    assert loaded_data['has_email'].dtype == bool
+    
+    print("✅ End-to-end pipeline test PASSED")
+
+def test_pipeline_with_incremental_load(source_db_connection, setup_source_data):
+    """Test incremental ETL pipeline with date filter."""
+    extractor = PostgresExtractor(source_db_connection)
+    
+    df = extractor.extract_customers(start_date='2024-02-01')
+    
+    assert len(df) == 2  # Only Feb and March records
+    assert all(pd.to_datetime(df['signup_date']) &gt;= pd.to_datetime('2024-02-01'))
+    
+    transformer = CustomerTransformer()
+    transformed = transformer.transform(df)
+    
+    validator = DataValidator(transformed)
+    assert validator.validate_row_count(min_rows=1)
+    
+    print("✅ Incremental pipeline test PASSED")</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 6: Error Handling & Edge Cases</h2>
+                <div class="code-block">
+                    <pre><code>def test_pipeline_handles_empty_extraction(source_db_connection):
+    """Test pipeline behavior with no data."""
+    extractor = PostgresExtractor(source_db_connection)
+    
+    df = extractor.extract_customers(start_date='2030-01-01')
+    
+    assert len(df) == 0
+    
+    validator = DataValidator(df)
+    assert validator.validate_row_count(min_rows=1) == False
+    assert "Expected at least 1 rows" in validator.errors[0]
+
+def test_pipeline_handles_data_quality_failure(source_db_connection, setup_source_data):
+    """Test pipeline with data quality violations."""
+    extractor = PostgresExtractor(source_db_connection)
+    df = extractor.extract_customers()
+    
+    df.loc[0, 'customer_id'] = df.loc[1, 'customer_id']  # Create duplicate
+    
+    validator = DataValidator(df)
+    assert validator.validate_unique('customer_id') == False
+    assert 'duplicates' in validator.errors[0].lower()</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Running the ETL Tests</h2>
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">Test Execution Commands</span></h4>
+                    <div class="code-block">
+                        <pre><code># Run all ETL tests
+pytest tests/ -v
+
+pytest tests/unit/ -v
+
+pytest tests/integration/ -v
+
+pytest tests/ --cov=src/etl --cov-report=html
+
+pytest tests/integration/test_end_to_end_pipeline.py::test_complete_etl_pipeline -v</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Key Testing Principles for ETL</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Test Data Isolation</h4>
+                        <p>Use containers and mocks to avoid dependencies on production data or systems.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Realistic Test Data</h4>
+                        <p>Include edge cases: nulls, duplicates, boundary values, and malformed data.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Schema Validation</h4>
+                        <p>Always validate column names, types, and required fields after transformations.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Incremental Testing</h4>
+                        <p>Test both full and incremental loads to ensure date filters work correctly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medallion Architecture E2E Testing Tab -->
+        <div id="medallion-project" class="tab-content">
+            <div class="section">
+                <h2>Medallion Architecture E2E Testing (Databricks + PySpark)</h2>
+                <p>Complete testing strategy for a multi-layer data lakehouse using Bronze → Silver → Gold medallion architecture on Databricks.</p>
+
+                <h3>Architecture Overview</h3>
+                <div class="code-block">
+                    <pre><code># Medallion Layers
+Bronze (Raw)     →  Silver (Cleansed)  →  Gold (Aggregated)
+────────────────    ──────────────────    ────────────────
+- Raw ingestion     - Data cleaning       - Business metrics
+- Schema on read    - Deduplication       - Aggregations
+- Append-only       - Type conversions    - Dimensional models
+- Delta format      - Validation rules    - Analytics-ready</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Project Structure</h2>
+                <div class="code-block">
+                    <pre><code>medallion_project/
+├── src/
+│   └── lakehouse/
+│       ├── bronze/
+│       │   └── ingest_raw_data.py
+│       ├── silver/
+│       │   └── cleanse_data.py
+│       ├── gold/
+│       │   └── aggregate_metrics.py
+│       └── utils/
+│           └── delta_utils.py
+├── tests/
+│   ├── conftest.py
+│   ├── unit/
+│   │   ├── test_bronze_layer.py
+│   │   ├── test_silver_layer.py
+│   │   └── test_gold_layer.py
+│   └── integration/
+│       └── test_medallion_e2e.py
+├── notebooks/
+│   ├── bronze_ingestion.py
+│   ├── silver_transformation.py
+│   └── gold_aggregation.py
+└── databricks.yaml</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 1: Test Fixtures Setup (conftest.py)</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+from pyspark.sql import SparkSession
+from delta import configure_spark_with_delta_pip
+import tempfile
+import shutil
+
+@pytest.fixture(scope="session")
+def spark():
+    """Create Spark session with Delta Lake support."""
+    builder = SparkSession.builder \
+        .appName("medallion-tests") \
+        .master("local[*]") \
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+        .config("spark.sql.catalog.spark_catalog", 
+                "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+        .config("spark.databricks.delta.retentionDurationCheck.enabled", "false")
+    
+    spark = configure_spark_with_delta_pip(builder).getOrCreate()
+    yield spark
+    spark.stop()
+
+@pytest.fixture(scope="function")
+def delta_paths():
+    """Create temporary paths for Bronze, Silver, Gold tables."""
+    base_path = tempfile.mkdtemp()
+    paths = {
+        'bronze': f"{base_path}/bronze/orders",
+        'silver': f"{base_path}/silver/orders",
+        'gold': f"{base_path}/gold/orders_summary"
+    }
+    yield paths
+    shutil.rmtree(base_path)
+
+@pytest.fixture
+def sample_raw_orders():
+    """Generate sample raw order data for Bronze layer."""
+    return [
+        {"order_id": "ORD001", "customer_id": "C123", "amount": "150.50", 
+         "order_date": "2024-01-15", "status": "completed", "source_system": "web"},
+        {"order_id": "ORD002", "customer_id": "C456", "amount": "275.00", 
+         "order_date": "2024-01-16", "status": "completed", "source_system": "mobile"},
+        {"order_id": "ORD003", "customer_id": "C123", "amount": "invalid", 
+         "order_date": "2024-01-17", "status": "pending", "source_system": "web"},
+        {"order_id": "ORD003", "customer_id": "C123", "amount": "99.99", 
+         "order_date": "2024-01-17", "status": "pending", "source_system": "web"},  # Duplicate
+        {"order_id": "ORD004", "customer_id": None, "amount": "50.00", 
+         "order_date": "2024-01-18", "status": "cancelled", "source_system": "api"},
+    ]</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 2: Bronze Layer - Raw Ingestion</h2>
+                <div class="code-block">
+                    <pre><code># src/lakehouse/bronze/ingest_raw_data.py
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+class BronzeIngestion:
+    def __init__(self, spark: SparkSession):
+        self.spark = spark
+    
+    def ingest_orders(self, source_data, bronze_path):
+        """Ingest raw orders into Bronze layer."""
+        df = self.spark.createDataFrame(source_data)
+        
+        df = df.withColumn("ingestion_timestamp", F.current_timestamp()) \
+               .withColumn("ingestion_date", F.current_date()) \
+               .withColumn("file_name", F.lit("source_file.json"))
+        
+        df.write.format("delta").mode("append").save(bronze_path)
+        
+        return df
+
+def test_bronze_ingestion_adds_metadata(spark, sample_raw_orders, delta_paths):
+    """Test that Bronze layer adds metadata columns."""
+    ingestion = BronzeIngestion(spark)
+    df = ingestion.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    bronze_df = spark.read.format("delta").load(delta_paths['bronze'])
+    
+    assert 'ingestion_timestamp' in bronze_df.columns
+    assert 'ingestion_date' in bronze_df.columns
+    assert 'file_name' in bronze_df.columns
+    
+    assert bronze_df.count() == 5
+
+def test_bronze_ingestion_preserves_raw_data(spark, sample_raw_orders, delta_paths):
+    """Test that Bronze layer preserves all raw data including invalid."""
+    ingestion = BronzeIngestion(spark)
+    ingestion.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    bronze_df = spark.read.format("delta").load(delta_paths['bronze'])
+    
+    invalid_row = bronze_df.filter(F.col("amount") == "invalid").count()
+    assert invalid_row == 1
+    
+    duplicate_orders = bronze_df.filter(F.col("order_id") == "ORD003").count()
+    assert duplicate_orders == 2</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 3: Silver Layer - Data Cleansing</h2>
+                <div class="code-block">
+                    <pre><code># src/lakehouse/silver/cleanse_data.py
+from pyspark.sql import functions as F
+from pyspark.sql.types import DecimalType, DateType
+
+class SilverTransformation:
+    def __init__(self, spark):
+        self.spark = spark
+    
+    def cleanse_orders(self, bronze_path, silver_path):
+        """Transform Bronze to Silver with cleansing logic."""
+        df = self.spark.read.format("delta").load(bronze_path)
+        
+        df = df.dropDuplicates(["order_id"])
+        
+        df = df.withColumn("amount_clean", 
+                          F.when(F.col("amount").cast(DecimalType(10,2)).isNotNull(),
+                                 F.col("amount").cast(DecimalType(10,2)))
+                          .otherwise(None))
+        
+        df = df.withColumn("order_date_clean", 
+                          F.to_date(F.col("order_date")))
+        
+        df = df.filter(
+            (F.col("customer_id").isNotNull()) &
+            (F.col("amount_clean").isNotNull()) &
+            (F.col("order_date_clean").isNotNull())
+        )
+        
+        df = df.withColumn("is_valid", F.lit(True)) \
+               .withColumn("cleansed_timestamp", F.current_timestamp())
+        
+        df = df.select(
+            F.col("order_id"),
+            F.col("customer_id"),
+            F.col("amount_clean").alias("amount"),
+            F.col("order_date_clean").alias("order_date"),
+            F.col("status"),
+            F.col("source_system"),
+            F.col("is_valid"),
+            F.col("cleansed_timestamp")
+        )
+        
+        df.write.format("delta").mode("overwrite").save(silver_path)
+        
+        return df
+
+def test_silver_removes_duplicates(spark, sample_raw_orders, delta_paths):
+    """Test that Silver layer removes duplicate order_ids."""
+    bronze = BronzeIngestion(spark)
+    bronze.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    silver = SilverTransformation(spark)
+    silver.cleanse_orders(delta_paths['bronze'], delta_paths['silver'])
+    
+    silver_df = spark.read.format("delta").load(delta_paths['silver'])
+    
+    unique_orders = silver_df.select("order_id").distinct().count()
+    assert unique_orders == silver_df.count()
+
+def test_silver_filters_invalid_records(spark, sample_raw_orders, delta_paths):
+    """Test that Silver layer filters out invalid data."""
+    bronze = BronzeIngestion(spark)
+    bronze.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    silver = SilverTransformation(spark)
+    silver.cleanse_orders(delta_paths['bronze'], delta_paths['silver'])
+    
+    silver_df = spark.read.format("delta").load(delta_paths['silver'])
+    
+    assert silver_df.count() == 2  # Only ORD001 and ORD002 are valid
+    assert silver_df.filter(F.col("amount").isNull()).count() == 0
+    assert silver_df.filter(F.col("customer_id").isNull()).count() == 0
+
+def test_silver_type_conversions(spark, sample_raw_orders, delta_paths):
+    """Test that Silver layer converts data types correctly."""
+    bronze = BronzeIngestion(spark)
+    bronze.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    silver = SilverTransformation(spark)
+    silver.cleanse_orders(delta_paths['bronze'], delta_paths['silver'])
+    
+    silver_df = spark.read.format("delta").load(delta_paths['silver'])
+    
+    assert str(silver_df.schema['amount'].dataType) == 'DecimalType(10,2)'
+    assert str(silver_df.schema['order_date'].dataType) == 'DateType()'</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 4: Gold Layer - Business Aggregations</h2>
+                <div class="code-block">
+                    <pre><code># src/lakehouse/gold/aggregate_metrics.py
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+class GoldAggregation:
+    def __init__(self, spark):
+        self.spark = spark
+    
+    def create_customer_summary(self, silver_path, gold_path):
+        """Create Gold layer customer summary metrics."""
+        df = self.spark.read.format("delta").load(silver_path)
+        
+        summary = df.groupBy("customer_id").agg(
+            F.count("order_id").alias("total_orders"),
+            F.sum("amount").alias("total_revenue"),
+            F.avg("amount").alias("avg_order_value"),
+            F.min("order_date").alias("first_order_date"),
+            F.max("order_date").alias("last_order_date"),
+            F.countDistinct("source_system").alias("unique_channels")
+        )
+        
+        summary = summary.withColumn(
+            "customer_lifetime_days",
+            F.datediff(F.col("last_order_date"), F.col("first_order_date"))
+        )
+        
+        summary = summary.withColumn(
+            "customer_segment",
+            F.when(F.col("total_orders") &gt;= 5, "loyal")
+            .when(F.col("total_orders") &gt;= 2, "repeat")
+            .otherwise("new")
+        )
+        
+        summary = summary.withColumn("report_date", F.current_date())
+        
+        summary.write.format("delta").mode("overwrite").save(gold_path)
+        
+        return summary
+
+def test_gold_customer_aggregations(spark, delta_paths):
+    """Test Gold layer creates correct customer aggregations."""
+    silver_data = [
+        ("ORD001", "C123", 150.50, "2024-01-15", "completed", "web"),
+        ("ORD002", "C456", 275.00, "2024-01-16", "completed", "mobile"),
+        ("ORD005", "C123", 99.99, "2024-01-20", "completed", "mobile"),
+    ]
+    
+    silver_df = spark.createDataFrame(
+        silver_data,
+        ["order_id", "customer_id", "amount", "order_date", "status", "source_system"]
+    )
+    silver_df = silver_df.withColumn("order_date", F.to_date("order_date"))
+    silver_df.write.format("delta").mode("overwrite").save(delta_paths['silver'])
+    
+    gold = GoldAggregation(spark)
+    gold.create_customer_summary(delta_paths['silver'], delta_paths['gold'])
+    
+    gold_df = spark.read.format("delta").load(delta_paths['gold'])
+    
+    assert gold_df.count() == 2  # Two unique customers
+    
+    c123 = gold_df.filter(F.col("customer_id") == "C123").first()
+    assert c123["total_orders"] == 2
+    assert float(c123["total_revenue"]) == pytest.approx(250.49, 0.01)
+    assert c123["customer_segment"] == "repeat"
+
+def test_gold_customer_segmentation(spark, delta_paths):
+    """Test customer segmentation logic in Gold layer."""
+    silver_data = [
+        ("O1", "C1", 100.0, "2024-01-01", "completed", "web"),  # 1 order = new
+        ("O2", "C2", 100.0, "2024-01-01", "completed", "web"),  # 3 orders = repeat
+        ("O3", "C2", 100.0, "2024-01-02", "completed", "web"),
+        ("O4", "C2", 100.0, "2024-01-03", "completed", "web"),
+        ("O5", "C3", 100.0, "2024-01-01", "completed", "web"),  # 6 orders = loyal
+        ("O6", "C3", 100.0, "2024-01-02", "completed", "web"),
+        ("O7", "C3", 100.0, "2024-01-03", "completed", "web"),
+        ("O8", "C3", 100.0, "2024-01-04", "completed", "web"),
+        ("O9", "C3", 100.0, "2024-01-05", "completed", "web"),
+        ("O10", "C3", 100.0, "2024-01-06", "completed", "web"),
+    ]
+    
+    silver_df = spark.createDataFrame(
+        silver_data,
+        ["order_id", "customer_id", "amount", "order_date", "status", "source_system"]
+    )
+    silver_df = silver_df.withColumn("order_date", F.to_date("order_date"))
+    silver_df.write.format("delta").mode("overwrite").save(delta_paths['silver'])
+    
+    gold = GoldAggregation(spark)
+    gold.create_customer_summary(delta_paths['silver'], delta_paths['gold'])
+    
+    gold_df = spark.read.format("delta").load(delta_paths['gold'])
+    
+    segments = gold_df.select("customer_id", "customer_segment").collect()
+    segment_map = {row.customer_id: row.customer_segment for row in segments}
+    
+    assert segment_map["C1"] == "new"
+    assert segment_map["C2"] == "repeat"
+    assert segment_map["C3"] == "loyal"</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 5: End-to-End Medallion Pipeline Test</h2>
+                <div class="code-block">
+                    <pre><code># tests/integration/test_medallion_e2e.py
+def test_complete_medallion_pipeline(spark, sample_raw_orders, delta_paths):
+    """Test complete Bronze → Silver → Gold pipeline."""
+    
+    print("\n📥 BRONZE: Ingesting raw data...")
+    bronze = BronzeIngestion(spark)
+    bronze.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    bronze_df = spark.read.format("delta").load(delta_paths['bronze'])
+    bronze_count = bronze_df.count()
+    
+    assert bronze_count == 5, f"Expected 5 Bronze records, got {bronze_count}"
+    print(f"✓ Bronze layer: {bronze_count} raw records ingested")
+    
+    print("\n🧹 SILVER: Cleansing and deduplicating...")
+    silver = SilverTransformation(spark)
+    silver.cleanse_orders(delta_paths['bronze'], delta_paths['silver'])
+    
+    silver_df = spark.read.format("delta").load(delta_paths['silver'])
+    silver_count = silver_df.count()
+    
+    assert silver_count == 2, f"Expected 2 valid Silver records, got {silver_count}"
+    
+    assert silver_df.filter(F.col("amount").isNull()).count() == 0
+    assert silver_df.filter(F.col("customer_id").isNull()).count() == 0
+    assert silver_df.select("order_id").distinct().count() == silver_count
+    
+    print(f"✓ Silver layer: {silver_count} cleansed records")
+    print(f"  - Removed {bronze_count - silver_count} invalid/duplicate records")
+    
+    print("\n📊 GOLD: Creating business aggregations...")
+    gold = GoldAggregation(spark)
+    gold.create_customer_summary(delta_paths['silver'], delta_paths['gold'])
+    
+    gold_df = spark.read.format("delta").load(delta_paths['gold'])
+    gold_count = gold_df.count()
+    
+    assert gold_count &gt; 0, "Gold layer has no records"
+    
+    expected_cols = ['customer_id', 'total_orders', 'total_revenue', 
+                     'avg_order_value', 'customer_segment']
+    for col in expected_cols:
+        assert col in gold_df.columns, f"Missing column: {col}"
+    
+    print(f"✓ Gold layer: {gold_count} customer summaries created")
+    
+    print("\n✅ BUSINESS VALIDATION:")
+    
+    silver_total = silver_df.agg(F.sum("amount")).first()[0]
+    gold_total = gold_df.agg(F.sum("total_revenue")).first()[0]
+    
+    assert float(silver_total) == pytest.approx(float(gold_total), 0.01), \
+        "Revenue mismatch between Silver and Gold"
+    
+    print(f"  - Revenue consistency: ${silver_total:.2f} (Silver) = ${gold_total:.2f} (Gold)")
+    
+    segments = gold_df.groupBy("customer_segment").count().collect()
+    print(f"  - Customer segments: {dict((r.customer_segment, r['count']) for r in segments)}")
+    
+    print("\n🎉 MEDALLION PIPELINE TEST PASSED!\n")
+
+def test_medallion_data_lineage(spark, sample_raw_orders, delta_paths):
+    """Test data lineage tracking through layers."""
+    bronze = BronzeIngestion(spark)
+    bronze.ingest_orders(sample_raw_orders, delta_paths['bronze'])
+    
+    silver = SilverTransformation(spark)
+    silver.cleanse_orders(delta_paths['bronze'], delta_paths['silver'])
+    
+    bronze_df = spark.read.format("delta").load(delta_paths['bronze'])
+    silver_df = spark.read.format("delta").load(delta_paths['silver'])
+    
+    bronze_orders = set([row.order_id for row in bronze_df.select("order_id").collect()])
+    silver_orders = set([row.order_id for row in silver_df.select("order_id").collect()])
+    
+    assert silver_orders.issubset(bronze_orders)
+    
+    filtered_orders = bronze_orders - silver_orders
+    print(f"Filtered orders: {filtered_orders}")
+    
+    assert "ORD004" in filtered_orders  # Null customer_id</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Step 6: Databricks-Specific Testing</h2>
+                <div class="code-block">
+                    <pre><code># Test with Databricks Connect (requires Databricks cluster)
+import pytest
+from databricks.connect import DatabricksSession
+
+@pytest.fixture(scope="session")
+def databricks_spark():
+    """Connect to Databricks cluster for remote testing."""
+    try:
+        spark = DatabricksSession.builder.getOrCreate()
+        yield spark
+    except Exception as e:
+        pytest.skip(f"Databricks not available: {e}")
+
+def test_medallion_on_databricks(databricks_spark, sample_raw_orders):
+    """Test pipeline on actual Databricks cluster."""
+    catalog = "dev"
+    schema = "test_schema"
+    
+    databricks_spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+    
+    bronze_table = f"{catalog}.{schema}.bronze_orders"
+    silver_table = f"{catalog}.{schema}.silver_orders"
+    gold_table = f"{catalog}.{schema}.gold_customer_summary"
+    
+    try:
+        bronze = BronzeIngestion(databricks_spark)
+        df = databricks_spark.createDataFrame(sample_raw_orders)
+        df.write.format("delta").mode("overwrite").saveAsTable(bronze_table)
+        
+        assert databricks_spark.catalog.tableExists(bronze_table)
+        
+        
+    finally:
+        databricks_spark.sql(f"DROP TABLE IF EXISTS {bronze_table}")
+        databricks_spark.sql(f"DROP TABLE IF EXISTS {silver_table}")
+        databricks_spark.sql(f"DROP TABLE IF EXISTS {gold_table}")</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Running Medallion Tests</h2>
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">Test Execution</span></h4>
+                    <div class="code-block">
+                        <pre><code># Local testing with PySpark
+pytest tests/ -v -s
+
+pytest tests/unit/ -v
+
+pytest tests/integration/test_medallion_e2e.py::test_complete_medallion_pipeline -v -s
+
+pytest tests/ --cov=src/lakehouse --cov-report=html
+
+pytest tests/unit/ -n auto</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Key Testing Principles for Medallion Architecture</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Layer Independence</h4>
+                        <p>Test each layer (Bronze, Silver, Gold) independently before E2E testing.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Delta Lake Features</h4>
+                        <p>Test time travel, schema evolution, and ACID transactions specific to Delta.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Data Quality Gates</h4>
+                        <p>Validate cleansing rules, deduplication, and type conversions at Silver layer.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Business Metrics</h4>
+                        <p>Verify aggregations and derived metrics match business requirements in Gold.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>CI/CD Integration for Databricks</h2>
+                <div class="code-block">
+                    <pre><code># .github/workflows/databricks-tests.yml
+name: Databricks Medallion Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install pyspark delta-spark pytest pytest-cov
+        pip install databricks-connect
+    
+    - name: Run unit tests
+      run: pytest tests/unit/ -v --cov=src/lakehouse
+    
+    - name: Run integration tests
+      run: pytest tests/integration/ -v
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Testing Checklist</h2>
+                <div class="warning">
+                    <h4><span class="badge badge-warning">Before Production</span></h4>
+                    <ul>
+                        <li>✓ Test schema validation at each layer</li>
+                        <li>✓ Verify deduplication logic removes correct records</li>
+                        <li>✓ Test type conversions handle invalid data gracefully</li>
+                        <li>✓ Validate aggregations match expected business metrics</li>
+                        <li>✓ Test incremental loads with date partitions</li>
+                        <li>✓ Verify Delta Lake time travel and versioning</li>
+                        <li>✓ Test pipeline with realistic data volumes</li>
+                        <li>✓ Validate error handling and recovery mechanisms</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Practices Tab -->
+        <div id="best-practices" class="tab-content">
+            <div class="section">
+                <h2>Testing Best Practices</h2>
+                <p>Follow these guidelines to write maintainable, effective tests.</p>
+            </div>
+
+            <div class="section">
+                <h2>1. Test Organization</h2>
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">File Structure</span></h4>
+                    <div class="code-block">
+                        <pre><code>project/
+├── src/
+│   └── myapp/
+│       ├── __init__.py
+│       ├── services.py
+│       └── models.py
+├── tests/
+│   ├── conftest.py          # Shared fixtures
+│   ├── unit/
+│   │   ├── test_services.py
+│   │   └── test_models.py
+│   └── integration/
+│       ├── test_database.py
+│       └── test_api.py
+└── pytest.ini</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>2. Naming Conventions</h2>
+                <ul>
+                    <li><strong>Test files:</strong> <code>test_*.py</code> or <code>*_test.py</code></li>
+                    <li><strong>Test functions:</strong> <code>test_*</code> (descriptive names)</li>
+                    <li><strong>Test classes:</strong> <code>Test*</code> (optional grouping)</li>
+                    <li><strong>Fixtures:</strong> Descriptive names indicating what they provide</li>
+                </ul>
+                <div class="code-block">
+                    <pre><code># Good naming examples
+def test_user_registration_with_valid_email():
+    pass
+
+def test_payment_processing_raises_error_on_invalid_card():
+    pass
+
+@pytest.fixture
+def authenticated_api_client():
+    pass</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>3. Test Independence</h2>
+                <div class="best-practice">
+                    <p>Each test should be independent and not rely on the execution order or state from other tests.</p>
+                    <div class="code-block">
+                        <pre><code># Bad: Tests depend on each other
+def test_create_user():
+    global user_id
+    user_id = create_user("Alice")
+
+def test_update_user():
+    update_user(user_id, name="Bob")  # Depends on previous test
+
+# Good: Each test is independent
+@pytest.fixture
+def user():
+    user_id = create_user("Alice")
+    yield user_id
+    delete_user(user_id)
+
+def test_update_user(user):
+    update_user(user, name="Bob")
+    assert get_user(user).name == "Bob"</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>4. Parametrized Tests</h2>
+                <p>Test multiple scenarios with a single test function using parametrization.</p>
+                <div class="code-block">
+                    <pre><code>import pytest
+
+@pytest.mark.parametrize("input,expected", [
+    ("hello", "HELLO"),
+    ("world", "WORLD"),
+    ("Python", "PYTHON"),
+    ("", ""),
+])
+def test_uppercase_conversion(input, expected):
+    assert input.upper() == expected
+
+@pytest.mark.parametrize("age,valid", [
+    (18, True),
+    (25, True),
+    (17, False),
+    (0, False),
+    (-5, False),
+])
+def test_age_validation(age, valid):
+    assert is_valid_age(age) == valid</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>5. Markers for Test Selection</h2>
+                <p>Use markers to categorize and selectively run tests.</p>
+                <div class="code-block">
+                    <pre><code>import pytest
+
+@pytest.mark.slow
+def test_database_migration():
+    # Time-consuming test
+    pass
+
+@pytest.mark.integration
+def test_external_api():
+    # Integration test
+    pass
+
+@pytest.mark.unit
+def test_helper_function():
+    # Fast unit test
+    pass</code></pre>
+                </div>
+                <p>Run specific markers:</p>
+                <div class="code-block">
+                    <pre><code># Run only fast tests
+pytest -m "not slow"
+
+# Run only integration tests
+pytest -m integration
+
+# Run unit tests
+pytest -m unit</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>6. Configuration with pytest.ini</h2>
+                <div class="code-block">
+                    <pre><code>[pytest]
+# Minimum version
+minversion = 7.0
+
+# Test discovery patterns
+python_files = test_*.py *_test.py
+python_classes = Test*
+python_functions = test_*
+
+# Custom markers
+markers =
+    slow: marks tests as slow
+    integration: marks tests as integration tests
+    unit: marks tests as unit tests
+
+# Output options
+addopts = -v --strict-markers --tb=short
+
+# Coverage options
+[coverage:run]
+source = src/
+omit = */tests/*</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>7. Continuous Integration</h2>
+                <div class="best-practice">
+                    <h4><span class="badge badge-best">GitHub Actions Example</span></h4>
+                    <div class="code-block">
+                        <pre><code>name: Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10, 3.11]
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-mock
+    
+    - name: Run tests
+      run: pytest --cov=src tests/
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>8. Coverage Goals</h2>
+                <div class="warning">
+                    <h4><span class="badge badge-warning">Coverage Metrics</span></h4>
+                    <ul>
+                        <li><strong>Aim for 80%+ coverage</strong> for critical business logic</li>
+                        <li><strong>100% coverage doesn't guarantee bug-free code</strong></li>
+                        <li>Focus on testing behavior, not just lines of code</li>
+                        <li>Use coverage to identify untested code paths</li>
+                    </ul>
+                </div>
+                <div class="code-block">
+                    <pre><code># Generate coverage report
+pytest --cov=src --cov-report=html tests/
+
+# Fail if coverage below threshold
+pytest --cov=src --cov-fail-under=80 tests/</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>9. Performance Testing</h2>
+                <div class="code-block">
+                    <pre><code>import pytest
+
+@pytest.mark.benchmark
+def test_query_performance(benchmark):
+    """Test that query completes within acceptable time."""
+    result = benchmark(expensive_query)
+    assert result is not None
+
+# Set timeout for slow tests
+@pytest.mark.timeout(5)
+def test_with_timeout():
+    # Must complete within 5 seconds
+    process_data()</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>10. Quick Reference Commands</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>pytest</code></td>
+                            <td>Run all tests in current directory</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest tests/test_file.py</code></td>
+                            <td>Run specific test file</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest -v</code></td>
+                            <td>Verbose output showing each test</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest -k "pattern"</code></td>
+                            <td>Run tests matching pattern in name</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest -m marker</code></td>
+                            <td>Run tests with specific marker</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest --lf</code></td>
+                            <td>Run only last failed tests</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest --ff</code></td>
+                            <td>Run failed tests first, then others</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest -x</code></td>
+                            <td>Stop after first failure</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest --maxfail=2</code></td>
+                            <td>Stop after 2 failures</td>
+                        </tr>
+                        <tr>
+                            <td><code>pytest --cov=src</code></td>
+                            <td>Run with coverage report</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with Pytest • Python Testing Framework</p>
+            <p>Master testing with fixtures, mocking, and integration strategies</p>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
